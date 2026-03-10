@@ -1,0 +1,13 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Generated output
+slides.html
+
+# macOS
+.DS_Store
+
+# The actual progress report (personal data — keep out of version control)
+doc/*.md
