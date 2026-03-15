@@ -1,45 +1,54 @@
 # Progress Report Slide Generator
 
-Converts a Markdown progress report into a browser-based slide deck (Reveal.js) showing upcoming milestones by urgency and a recommended work plan for the next period.
+Turns your Markdown progress report into a browser-based slide deck showing upcoming milestones by urgency and a recommended work plan.
 
-## How it works
+---
 
-1. Reads a `.md` file from the `doc/` folder
-2. Parses `# Goals/Milestones` for incomplete milestones and their due dates
-3. Parses `# Previews/Reviews` for recent time-tracking data
-4. Generates `slides.html` — a Reveal.js presentation that opens in your browser
+## Before you start (one-time setup)
 
-### Slides produced
+You need **Python 3.10** installed on your Mac. You only do this once.
 
-| Slide | Content |
+**Check if it's already installed** — open Terminal and run:
+```
+python3.10 --version
+```
+- If you see `Python 3.10.x` → you're ready, skip to [Using the app](#using-the-app).
+- If you see an error → install Python 3.10:
+  - **Option A:** Download from [python.org](https://www.python.org/downloads/)
+  - **Option B:** If you have Homebrew: `brew install python@3.10`
+
+Everything else (the virtual environment, packages) is set up **automatically** the first time you double-click the launcher.
+
+---
+
+## Using the app
+
+1. Put your progress report `.md` file inside the `doc/` folder.
+2. **Double-click `generate-slides.command`** in Finder.
+   - The first time, it will set up the environment automatically — this takes a few seconds.
+   - A Terminal window will open, generate the slides, then close.
+3. `slides.html` opens in your browser automatically.
+4. Navigate slides with the **arrow keys** or on-screen arrows.
+
+> **If macOS blocks the file on first run:** right-click `generate-slides.command` → Open → Open. You only need to do this once.
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
 |---|---|
-| Overdue / This Week / Next 2 Weeks / This Month / Later | Milestone tables grouped by urgency, colour-coded by days remaining |
-| Recommended Plan | Suggested hours per task, derived from in-progress items, overdue deadlines, and recurring pushed-back tasks |
+| Double-click does nothing | Right-click → Open → Open (one-time Gatekeeper bypass) |
+| `python3.10: command not found` | Install Python 3.10 — see [Before you start](#before-you-start-one-time-setup) |
+| Slides open but look unstyled | You need an internet connection the first time (Reveal.js loads from CDN) |
+| A milestone is missing | Check it doesn't have `Status: completed`, `done`, or `audit completed` |
+| Wrong section parsed | Headings must be exactly `# Goals/Milestones` and `# Previews/Reviews` |
 
-## Requirements
-
-- **macOS** (the `.command` launcher is macOS-only; `app.py` runs anywhere with Python)
-- **Python 3.10** — no third-party packages needed (stdlib only)
-- Internet connection for the first browser open (Reveal.js loads from CDN; cached after that)
-
-## Quickstart
-
-```
-# 1. Put your progress report in doc/
-cp "My Progress Report.md" doc/
-
-# 2. Double-click generate-slides.command in Finder
-#    — or run from Terminal:
-.venv/bin/python3.10 app.py
-
-# 3. slides.html opens in your browser automatically
-```
-
-> If macOS blocks `generate-slides.command` on first run: right-click → Open → Open.
+---
 
 ## Progress report format
 
-The `.md` file must contain two top-level sections:
+Your `.md` file must contain two top-level sections:
 
 ### `# Goals/Milestones`
 
@@ -50,8 +59,8 @@ The `.md` file must contain two top-level sections:
   * Status: <free text>
 ```
 
-- Milestones with `Status: completed`, `done`, or `audit completed` are **excluded** from slides.
-- Due dates are parsed from the last `[MM/DD/YY]` in any `[...]` bracket on the milestone line.
+- Milestones with `Status: completed`, `done`, or `audit completed` are excluded from slides.
+- Due dates are parsed from the last `[MM/DD/YY]` bracket on the milestone line.
 - Multiple dates in one bracket (e.g. `[01/15/26→02/06/26]`) use the **last** date.
 
 ### `# Previews/Reviews`
@@ -64,36 +73,25 @@ Total: 20
 
 Used to calculate the average hours per period and identify tasks that are repeatedly pushed back.
 
-## Project structure
+---
+
+## What each file is for
 
 ```
 progress-report/
 ├── doc/                        ← place your .md file here
-├── .venv/                      ← Python virtual environment (stdlib only)
+├── .venv/                      ← Python virtual environment (auto-created on first run)
 ├── app.py                      ← slide generation logic
-├── generate-slides.command     ← double-click launcher (macOS)
+├── generate-slides.command     ← double-click this to run
 ├── slides.html                 ← generated output (overwritten each run)
-├── requirements.txt            ← no external packages
-└── SETUP.md                    ← first-time setup instructions
+├── requirements.txt            ← package list (currently no external packages needed)
+└── SETUP.md                    ← detailed setup guide
 ```
 
-## Recreating the virtual environment
+---
 
-If `.venv` is missing:
+## Requirements
 
-```bash
-python3.10 -m venv .venv
-```
-
-No `pip install` needed — the app uses only the Python standard library.
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| Double-click does nothing | Right-click → Open → Open (one-time Gatekeeper bypass) |
-| `python3.10: command not found` | Install Python 3.10 via [python.org](https://www.python.org/downloads/) or `brew install python@3.10` |
-| `.venv` missing | Run `python3.10 -m venv .venv` in this folder |
-| Slides look unstyled | Need internet on first load (Reveal.js CDN) |
-| Milestone not appearing | Check it doesn't have `Status: completed/done/audit completed` |
-| Wrong section parsed | Ensure headings are exactly `# Goals/Milestones` and `# Previews/Reviews` |
+- macOS (the double-click launcher is macOS-only; `app.py` runs anywhere with Python)
+- Python 3.10
+- Internet connection the first time slides are opened (Reveal.js CDN; cached after that)
