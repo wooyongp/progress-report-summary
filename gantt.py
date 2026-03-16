@@ -241,7 +241,38 @@ def build_svg(milestones: list[dict], today: datetime) -> str:
 # HTML wrapper
 # ---------------------------------------------------------------------------
 
-def render_html(svg: str, today: datetime) -> str:
+def render_overdue_table(overdue: list[dict]) -> str:
+    if not overdue:
+        return ""
+    rows = "".join(
+        f'<tr>'
+        f'<td style="padding:6px 10px;color:#6b7280;font-size:12px;white-space:nowrap">'
+        f'{m["due_date"].strftime("%m/%d/%Y")}</td>'
+        f'<td style="padding:6px 10px;color:#6366f1;font-size:11px;white-space:nowrap">'
+        f'{esc(m["goal"][:40] + ("…" if len(m["goal"]) > 40 else ""))}</td>'
+        f'<td style="padding:6px 10px;color:#374151;font-size:12px">{esc(m["description"])}</td>'
+        f'</tr>'
+        for m in overdue
+    )
+    return f"""
+  <div class="card" style="margin-top:16px">
+    <div style="font-size:0.95rem;font-weight:600;color:#b91c1c;margin-bottom:10px">
+      ⚠ Overdue Milestones
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#fef2f2">
+          <th style="padding:6px 10px;text-align:left;font-size:11px;color:#9ca3af;font-weight:600;border-bottom:1px solid #fca5a5">Due Date</th>
+          <th style="padding:6px 10px;text-align:left;font-size:11px;color:#9ca3af;font-weight:600;border-bottom:1px solid #fca5a5">Goal</th>
+          <th style="padding:6px 10px;text-align:left;font-size:11px;color:#9ca3af;font-weight:600;border-bottom:1px solid #fca5a5">Milestone</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </div>"""
+
+
+def render_html(svg: str, today: datetime, overdue: list[dict] | None = None) -> str:
     date_str = today.strftime("%B %d, %Y")
     legend_items = [
         ("overdue",      "#fca5a5", "#b91c1c", "Overdue"),
@@ -257,6 +288,7 @@ def render_html(svg: str, today: datetime) -> str:
         f'<span style="font-size:13px;color:#374151">{label}</span></span>'
         for _, bg, border, label in legend_items
     )
+    overdue_html = render_overdue_table(overdue or [])
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -282,10 +314,9 @@ def render_html(svg: str, today: datetime) -> str:
     {svg}
     <p class="note">
       Milestones without a due date are not shown. &nbsp;
-      Completed milestones are excluded. &nbsp;
-      Overdue milestones (past today) are excluded.
+      Completed milestones are excluded.
     </p>
-  </div>
+  </div>{overdue_html}
 </body>
 </html>
 """
@@ -306,8 +337,13 @@ def main():
     today = datetime.today()
     milestones = parse_milestones(goals_section)
 
+    overdue = sorted(
+        [m for m in milestones if m["due_date"] and m["due_date"].date() < today.date()],
+        key=lambda m: m["due_date"],
+    )
+
     svg = build_svg(milestones, today)
-    html = render_html(svg, today)
+    html = render_html(svg, today, overdue)
 
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"Gantt chart written to: {OUTPUT_PATH}")
