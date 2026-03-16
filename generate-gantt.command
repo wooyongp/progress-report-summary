@@ -1,11 +1,11 @@
 #!/bin/bash
-# Double-click this file in Finder to regenerate the slides and open them.
+# Double-click this file in Finder to regenerate the Gantt chart and open it.
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 VENV="$DIR/.venv"
 PYTHON="$VENV/bin/python3.10"
 PIP="$VENV/bin/pip"
-SLIDES="$DIR/slides.html"
+OUTPUT="$DIR/gantt.html"
 
 # --- Create or recreate .venv if missing or stale (e.g. after moving the folder) ---
 if [ ! -d "$VENV" ] || ! "$PYTHON" -c "" 2>/dev/null || ! "$PYTHON" -m pip --version 2>/dev/null >/dev/null; then
@@ -34,15 +34,15 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# --- Generate slides ---
-echo "Generating slides..."
-"$PYTHON" "$DIR/app.py"
+# --- Generate Gantt chart ---
+echo "Generating Gantt chart..."
+"$PYTHON" "$DIR/gantt.py"
 
 if [ $? -eq 0 ]; then
-  echo "Opening slides in browser..."
-  open "$SLIDES"
+  echo "Opening Gantt chart in browser..."
+  open "$OUTPUT"
 else
   echo ""
-  echo "ERROR: Slide generation failed."
+  echo "ERROR: Gantt chart generation failed."
   read -p "Press Enter to close..."
 fi
