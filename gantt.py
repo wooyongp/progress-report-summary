@@ -24,7 +24,7 @@ OUTPUT_PATH = Path(__file__).parent / "gantt.html"
 
 ROW_H       = 32        # px per milestone row
 ROW_PAD     = 4         # px padding inside row
-LABEL_W     = 260       # px for the left label column
+LABEL_W     = 380       # px for the left label column
 CHART_W     = 900       # px for the chart area
 HEADER_H    = 60        # px for date axis header
 FOOTER_H    = 20
@@ -179,7 +179,7 @@ def build_svg(milestones: list[dict], today: datetime) -> str:
 
         # label on left
         label = m["description"]
-        max_chars = 35
+        max_chars = 55
         if len(label) > max_chars:
             label = label[:max_chars - 1] + "…"
         lines.append(
