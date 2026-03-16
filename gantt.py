@@ -82,7 +82,7 @@ def x_pos(d: datetime, start: datetime, span_days: int) -> float:
 
 
 def build_svg(milestones: list[dict], today: datetime) -> str:
-    dated = [m for m in milestones if m["due_date"]]
+    dated = [m for m in milestones if m["due_date"] and m["due_date"].date() >= today.date()]
     dated.sort(key=lambda m: m["due_date"])
 
     if not dated:
@@ -282,7 +282,8 @@ def render_html(svg: str, today: datetime) -> str:
     {svg}
     <p class="note">
       Milestones without a due date are not shown. &nbsp;
-      Completed milestones are excluded.
+      Completed milestones are excluded. &nbsp;
+      Overdue milestones (past today) are excluded.
     </p>
   </div>
 </body>
